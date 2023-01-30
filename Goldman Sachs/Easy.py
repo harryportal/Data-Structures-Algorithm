@@ -1,11 +1,15 @@
+import collections
 import math
 from typing import List, Optional
 from heapq import heappush
 import heapq
 from Linkedlist import ListNode
 
-
 # 1 Check if the Sentence Is Pangram
+from Trees import TreeNode
+
+
+# 1 Check Pangram
 def checkIfPangram(self, sentence: str) -> bool:
     # create an hashset to hold unique characters, keep adding the characters to the hashset as
     # you go through the list, if the length of the set gets to 26 at any point return True
@@ -34,7 +38,6 @@ def highFive(self, items: List[List[int]]) -> List[List[int]]:
         heappush(hashmap[id], -score)  # using negative here since python only offers min heap
 
     result = []
-
     # compute the average for each id
     for id in hashmap:
         scores = hashmap[id]
@@ -138,15 +141,16 @@ def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
 
 # 9 Two Sum
 def twoSum(self, nums: List[int], target: int) -> List[int]:
-    hashmap = {}
+    hashmap = {}  # map the numbers in the list to their index
     for index, value in enumerate(nums):
-        if target - value in hashmap:
-            return [index, hashmap[target - value]]
+        remainder = target - value
+        if remainder in hashmap:
+            return [index, hashmap[remainder]]
         hashmap[value] = index
     return []
 
 
-# 10 Count Binary Strings
+# 10 Count Binary Strings   *
 def countBinarySubstrings(self, s: str) -> int:
     """
     Check this for detailed explanation
@@ -197,7 +201,7 @@ def pivotIndex(self, nums: List[int]) -> int:
     return -1
 
 
-# 13 Pascal Triangle II
+# 13 Pascal Triangle II  *
 def getRow(self, rowIndex: int) -> List[int]:
     # so the first approach we can use here is to simple generate r number of rows for the pascal triangle
     # and then return the last row in our list as the answer -- rutime O(n^2)
@@ -228,12 +232,19 @@ def fib(n: int) -> int:
     #     return n
     # return fib(n - 1) + fib(n - 2)
 
-    # dynamic programming approach -- bottom up (reuse previously computed result if they reappear - O(n)
+    # dynamic programming approach -- bottom up iteration
     fib = [0] * (n + 1)
     fib[1] = 1
     for i in range(2, n + 1):
         fib[i] = fib[i - 1] + fib[i - 2]
     return fib[n]
+
+    # dynamic programming approach  II - Top down memoization
+    # cache = {}
+    # if n <= 1: return n
+    # if n not in cache:
+    #   cache[n] = fib(n-1) + fib(n-2)
+    # return cache[n]
 
 
 # 15 Valid Anagram
@@ -271,16 +282,12 @@ class MyHashMap:
 
 # 17 Counting Bit
 def countBits(self, n: int) -> List[int]:
-    # one approach is to have a helper function that converts the number to binary and count the number of  - O(nlogn)
-    # I'll come back to optimize this using dynamic programming or bit manipulation
     def count(num: int):
         count = 0
-        while num != 0:
-            if num % 2 == 1:
-                count += 1
-            num //= 2
+        while num:
+            if num & 1: count += 1
+            num >>= 1
         return count
-
     result = []
     for i in range(n + 1):
         result.append(count(i))
@@ -308,7 +315,7 @@ def sortByBits(self, arr: List[int]) -> List[int]:
         # 1 to zero or let's use the usual method of( right shifting and AND logic )since that's more intuitive and
         # can easily be explained to the interviewer
         count = 0
-        for _ in range(32):
+        while n:  # this will continue until n is zero(runtime is O(32) if in worst case all the bits are 1
             if n & 1:
                 count += 1
             n >>= 1
@@ -329,7 +336,7 @@ def climbStairs(self, n: int) -> int:
     # gramming approach
 
     # Bottom Up Approach
-    if n <= 2: return n  # edge case
+    if n <= 2: return n
     dp = [0] * (n + 1)
     dp[1], dp[2] = 1, 2
     for i in range(3, n + 1):
@@ -351,11 +358,12 @@ def climbStairs(self, n: int) -> int:
 # 20 Minimum Value to Get Positive Step by Step Sum
 def minStartValue(self, nums: List[int]) -> int:
     # we precompute the sum using 0 as a start value and get the minimum of the step by step sum
-    # Our minimum start value should be able to make the current minimum step by step sum equal to exactly 1
+    # Our minimum start value should be able to make the minimum of all step by step sum equal to exactly 1
     total, minStep = 0, 0
     for num in nums:
         total += num
         minStep = min(total, minStep)
+    return 1 - minStep
 
 
 # 21 Greatest Common Divisor of Two Strings
@@ -372,4 +380,199 @@ def gcdOfStrings(self, str1: str, str2: str) -> str:
     gcdLength = math.gcd(len(str1), len(str2))
     return str1[:gcdLength]
 
-    return 1 - minStep
+
+# 22 Reverse String
+def reverseString(self, s: List[str]) -> None:
+    # we simply make use of two pointers to swap the letters in place
+    left, right = 0, len(s) - 1
+    while left < right:
+        s[left], s[right] = s[right], s[left]
+        left += 1
+        right -= 1
+
+
+# 23 Height Checker
+def heightChecker(self, heights: List[int]) -> int:
+    expected = sorted(heights)
+    indices = 0
+    for index, height in enumerate(heights):
+        if expected[index] != height:
+            indices += 1
+    return indices
+
+
+# 24 Middle of Linked list
+def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]:
+    # One approach is to store all the value in the linked list and return the value at the middle
+    # We can reduce the space complexity to 0(1) by using a slow and fast pointer
+    # the fast pointer will traverse the linked list twice as fast as the slow pointer so when we fast pointer is at
+    # the end, the slow will definitely point to the middle
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow
+
+
+# 25 Invert Tree
+def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+    # start with root, invert the child nodes, do the same recursively for the child nodes
+    # O(n) runtime going through all the nodes and 0(n) for the recursive function call stack
+    if not root: return None  # edge case
+    root.left, root.right = root.right, root.left
+    self.invertTree(root.left)
+    self.invertTree(root.right)
+    return root
+
+
+# 26 Binary Tree Inorder Traversal
+def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+    # inorder traversal --> left -- root -- right
+    # let's solve this with an iterative dfs using stack
+    stack, result, curr = [], [], root
+    if not curr: return []  # edge case
+    while curr or stack:
+        while curr:  # keep going along the left branch of the current node
+            stack.append(curr.val)
+            curr = curr.left
+        node = stack.pop()
+        result.append(node.val)
+        if node.right: curr = node.right
+    return result
+
+
+# 27 Reverse Linked list
+def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+    # reversing the linked list means we now want the tail to be the head, first off remember the tail points to None
+    # if the head is going to be the tail now, it has to point to None and then we keep reversing the pointers
+    if not head: return None
+    prev, curr = None, head
+    while curr:
+        temp = curr.next  # temporarily store the next node in the linked list
+        curr.next = prev  # make the current node point to the prev node(in this case starts from None)
+        prev = curr
+        curr = temp
+    return prev
+
+
+# 28 Next Greater Element
+def nextGreaterElement(self, nums1: List[int], nums2: List[int]) -> List[int]:
+    # Neetcode explains here well https://www.youtube.com/watch?v=68a1Dc_qVq4
+    numsIndex = {num: index for index, num in enumerate(nums1)}
+    result = [-1] * len(nums1)
+    stack = []
+    for num in nums2:
+        while stack and stack[-1] < num:
+            value = stack.pop()
+            index = numsIndex[value]
+            result[index] = num
+        if num in numsIndex:
+            stack.append(num)
+    return result
+
+
+# 29 Binary Search
+def search(self, nums: List[int], target: int) -> int:
+    low, high = 0, len(nums) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] > target:
+            high = mid - 1
+        else:
+            low = mid + 1
+    return -1
+
+
+# 30 Delete Duplicates from sorted Lists
+def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+    pointer = head
+    while pointer and pointer.next:
+        if pointer.val == pointer.next.val:
+            pointer.next = pointer.next.next
+        else:
+            pointer = pointer.next
+    return head
+
+
+# 31 Move Zeroes
+def moveZeroes(self, nums: List[int]) -> None:
+    # One approach is to create two arrays, store the zeroes in ones and the others in the second one and join the two
+    # lists. We can optimize the space complexity to 0(1) by using the knowledge of quick sort algorithm to partition
+    # also seeing the question as "moving the non zeroes to the front" rather than "moving the zeros to the back" makes
+    # the solution more intuitive
+    left = 0
+    for right in range(len(nums)):
+        if nums[right] > 0:
+            nums[right], nums[left] = nums[left], nums[right]
+            left += 1
+
+
+# 32 Implement Stack using Queues
+class MyStack:
+
+    def __init__(self):
+        self.queue = collections.deque()
+
+    def push(self, x: int) -> None:
+        self.queue.append(x)
+
+    def pop(self) -> int:
+        for i in range(len(self.queue) - 1):
+            self.push(self.queue.popleft())
+        return self.queue.popleft()
+
+    def top(self) -> int:
+        return self.queue[-1]
+
+    def empty(self) -> bool:
+        return len(self.queue) == 0
+
+
+# 33 Symmetric Tree
+def isSymmetric(self, root: Optional[TreeNode]) -> bool:
+    if not root: return True  # edge case
+
+    # we basically define an helper function to check the nodes recursively
+    def check(nodeA, nodeB):
+        if not nodeA and not nodeB: return True
+        if not nodeA or not nodeB or nodeA.val != nodeB.val:
+            return False
+        return check(nodeA.left, nodeB.right) and check(nodeA.right, nodeB.left)
+
+    return check(root.left, root.right)
+
+
+# 34 Last Stone Weight
+def lastStoneWeight(self, stones: List[int]) -> int:
+    # Using a max heap will come in handy here as we need a way to efficiently get the two maximum stones as we
+    # iterate through the list in one pass
+    stones = [-stone for stone in stones]  # making all the values negative since python only supports min heaps
+    heapq.heapify(stones)  # converts to a max heap
+    for stone in stones:
+        weightY = heapq.heappop(stones)
+        weightX = heapq.heappop(stones)
+        if abs(weightY) > abs(weightX):  # it's either they are equal or Y is greater
+            heapq.heappush(stones, weightY - weightX)
+    return 0 if not stones else abs(stones[-1])
+
+
+# 35 Determine if Two Events Have Conflict
+def haveConflict(self, event1: List[str], event2: List[str]) -> bool:
+    # Two events are said to have conflicts if the start time or end time overalaps
+    def convert(timeStr):  # an helper function to convert the string to a 24 hour time
+        time = (int(timeStr[:2]) * 100) + int(timeStr[3:])
+        return time
+
+    startA, endA = convert(event1[0]), convert(event1[1])
+    startB, endB = convert(event2[0]), convert(event2[1])
+    return startA <= endB and startB <= endA
+
+
+# 36 . Keep Multiplying Found Values by Two
+def findFinalValue(self, nums: List[int], original: int) -> int:
+    hashset = set(nums)  # clarify with your interviewer if the values will be unique, if they won't we use an hashmap
+    while original in hashset:
+        original *= 2
+    return original
