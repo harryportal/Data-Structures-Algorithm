@@ -183,26 +183,22 @@ def longestPalindrome(self, s: str) -> str:
     # we would need to consider cases for odd even length
     result = ""
     maximum_length = 0
-    for i in range(len(s)):
-        # odd palindrome
-        left, right = i, i
-        while left >= 0 and right < len(s) and s[left] == s[right]:
+
+    def check(left, right):
+        while left >= 0 and right < len(s) and s[right] == s[left]:
             length = right - left + 1
             if length > maximum_length:
                 result = s[left:right + 1]
-                maximum_length = length
+                maximum_length = result
             left -= 1
             right += 1
 
+    for i in range(len(s)):
+        # odd palindrome
+        check(i, i)
+
         # even palindrome
-        left, right = i, i + 1
-        while left >= 0 and right < len(s) and s[left] == s[right]:
-            length = right - left + 1
-            if length > maximum_length:
-                result = s[left:right + 1]
-                maximum_length = length
-            left -= 1
-            right += 1
+        check(i, i + 1)
     return result
 
 
@@ -212,18 +208,17 @@ def compress(self, chars: List[str]) -> int:
     counter = {}  # get the letters and their frequency
     for i in chars:
         counter[i] = 1 + counter.get(i, 0)
-    char_count = len(counter)  # number of characters
-    value_count = 0
+    count = len(counter)  # number of characters
     for i in counter.keys():  # get the length of the each frequency digits(if it's not 1)
         if i != 1:
-            value_count += len(str(i))
-    return value_count + char_count
+            count += len(str(i))
+    return
 
 
 # 11 Fraction to Recurring Decimal
 def fractionToDecimal(self, numerator: int, denominator: int) -> str:
     # this is a very tricky problem
-    # spent up to 15min trying to understand someones approach
+    # spent up to 15min trying to understand someone's approach
     # i'll try to break it down and explain each logic
     if numerator == 0: return "0"  # edge case
 
@@ -282,7 +277,7 @@ def numIslands(self, grid: List[List[str]]) -> int:
     def dfs(row, col):
         if not (row in range(rows) and col in range(cols)) or grid[row][col] != "1":
             return
-        # mark the position as visited by changing the value (if the interveiwer allows that)
+        # mark the position as visited by changing the value (if the interveiwer permits the input grid modified)
         # or use a hashset to keep track of visited positions
         grid[row][col] = "*"
         dfs(row + 1, col)
@@ -370,10 +365,9 @@ def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
 
 # 16 Largest Numbers
 def largestNumber(self, nums: List[int]) -> str:
-    # this is actually a very unintuitive approach
     # for each pairwise comparison during the sort, we compare the
     # numbers achieved by concatenating the pair in both orders
-    nums = list(map(str, nums))  # convert all the integers to strings
+    nums = [str(i) for i in nums]  # convert all the integers to strings
 
     def compare(n1, n2):  # define a custom sorting function
         if n1 + n2 > n2 + n1:
@@ -388,7 +382,7 @@ def largestNumber(self, nums: List[int]) -> str:
     return "".join(nums) if nums[0] != "0" else "0"
 
 
-# 17 Meeting Rooms
+# 17 Meeting Rooms  *
 def minMeetingRooms(self, intervals: List[List[int]]) -> int:
     # basically for every meeting, we need to know if it starts a time less than the end time of another
     # meeting, if this happens we know the two meetings would overlap so we allocate a seperate room for the
@@ -397,7 +391,7 @@ def minMeetingRooms(self, intervals: List[List[int]]) -> int:
     # greedy with this approach
     # let's seperate the meetings into start time and end time and sort them seperately
     starting_times = sorted([time[0] for time in intervals])
-    ending_times = sorted([time[0] for time in intervals])
+    ending_times = sorted([time[1] for time in intervals])
 
     rooms, start, end = 0, 0, 0
     maxrooms = 0
@@ -462,17 +456,18 @@ def maxArea(self, height: List[int]) -> int:
     # we can optimize it to linear time using two pointers approach,
     # we set our left and right pointers to the first and last height respectively and we only shift the
     # pointers that have a lower height
-    left, rigth, maximumArea = 0, len(height) - 1, 0
-    while left <= rigth:
-        area = (rigth - left) * min(height[left], height[rigth])
+    left, right, maximumArea = 0, len(height) - 1, 0
+    while left <= right:
+        area = (right - left) * min(height[left], height[right])
         maximumArea = max(maximumArea, area)
-        if height[left] <= height[rigth]:
+        if height[left] <= height[right]:
             left += 1
         else:
-            rigth -= 1
+            right -= 1
     return maximumArea
 
 
+# continue
 # 23 Word Search  *
 def exist(self, board: List[List[str]], word: str) -> bool:
     # This can be solved with backtracking
@@ -537,12 +532,11 @@ def orangesRotting(self, grid: List[List[int]]) -> int:
 def deleteAndEarn(self, nums: List[int]) -> int:
     # This is another dynamic programming problem
     # I'll explain the logic to solving the problem using Bottom Up Approach
-    maxNumber = 0
-    points = {i: 0 for i in range(max(nums) + 1)}  # or use collection.defaultdict(int)
+    maxNumber = max(nums)
+    points = {i: 0 for i in range(maxNumber + 1)}  # or use collection.defaultdict(int)
     # First we map each number to get the points we can get from it and get the maximum of the numbers at the same time
     for num in nums:
         points[num] = num + points.get(num, 0)
-        maxNumber = max(num, maxNumber)
     maxEarnings = [0] * (maxNumber + 1)
     maxEarnings[1] = points[1]
     # The maximum you can earn at any points will the max of you taking the current price n (which means you can't take
@@ -552,7 +546,7 @@ def deleteAndEarn(self, nums: List[int]) -> int:
     return maxEarnings[maxNumber]
 
 
-# 26 Coin Change
+# 26 Coin Change  *
 def coinChange(self, coins: List[int], amount: int) -> int:
     # Neetcode explains well here! https://www.youtube.com/watch?v=H9bfqozjoqs
     dp = [math.inf] * (amount + 1)
@@ -563,3 +557,300 @@ def coinChange(self, coins: List[int], amount: int) -> int:
                 dp[i] = min(dp[i], 1 + dp[i - coin])
     result = dp[amount]
     return result if result != math.inf else -1
+
+
+# 27 House Robber
+def rob(self, nums: List[int]) -> int:
+    # at every house we basically have two choices
+    # 1. To rob the current house(which means we were not able to rob the previous house)
+    # 2. Not rob the current house, the money we have so far is what we've up to the previous house
+    # This is another dynamic programming because we are after an optimal value and the future decisions are affected
+    # by earlier decisions
+    n = len(nums)
+    robbing = [0] * (n + 1)
+    robbing[0] = nums[0]  # if you're at the first house you have a choice of robbing the house or not robbing at all
+    robbing[1] = max(nums[0], nums[1])  # if you have just two houses left to rob, you rob the house that has more lol
+    for i in range(2, n + 1):
+        robbing[i] = max(robbing[i - 1], nums[i] + robbing[i - 2])
+    return robbing[n]
+
+
+# 28 Decode Ways
+def numDecodings(self, s: str) -> int:
+    # Basically at every index we can either decode it as a single digit or a double digits provided that it is valid
+    # The current index becomes invalid if it's equal to zero "0" and the double digits is invalid if it's more than 26
+    # This will be solved recursively(2^n) but will reduced to 0(n) using memoization since the recursive functions have
+    # overallaping calls
+    cache = {}
+
+    def dfs(index):
+        if index == len(s):  # we found a valid decodings
+            return 1
+        if s[index] == "0":  # we found an invalid decoding
+            return 0
+        if index == len(s) - 1: return 1
+        if index not in cache:
+            res = dfs(index + 1)  # as a single digit
+            if int(s[index:index + 2]) <= 26: res += dfs(index + 2)
+            cache[index] = res
+        return cache[index]
+
+    return dfs(0)
+
+
+# 29 K diff pairs in an array
+def findPairs(self, nums: List[int], k: int) -> int:
+    hashmap = {}
+    for i in nums:
+        hashmap[i] = 1 + hashmap.get(i, 0)
+    counter = 0
+    if k == 0:
+        for i in hashmap.values():
+            if i > 1: counter += 1
+        return counter
+    for i in hashmap:
+        if i + k in hashmap:
+            counter += 1
+    return counter
+
+
+# 30 String to Integer Atoi
+def myAtoi(self, s: str) -> int:
+    index, sign, n = 0, 1, len(s)
+    result, maxInt, minInt = 0, pow(2, 31) - 1, -pow(2, 31)
+
+    # let's ignore leading whitespaces
+    while index < n and s[index] == " ":
+        index += 1
+
+    # let's check if it has a negative sign
+    if index < n and s[index] == "-":
+        sign = -1
+        index += 1
+    elif index < n and s[index] == "+":
+        index += 1
+
+    # keep getting the digits until a non digit is met
+    while index < n and s[index].isdigit():
+        # check for overflow and underflow
+        value = int(s[index])
+        if result > maxInt // 10 or (result == maxInt // 10 and value > maxInt % 10):
+            return maxInt if sign == 1 else minInt
+
+        # if the code get's here then there would be no overflow after adding the current value
+        result = result * 10 + value
+        index += 1
+    return sign * result
+
+
+# 31 Asteroid Collision
+def asteroidCollision(self, asteroids: List[int]) -> List[int]:
+    # we use a stack to keep track of the asteroids that have not collided
+    # a collision only happens if the item at the asteroid is moving to the the right and the one about to be added
+    # is moving to the left direction(this can be checked with the sign)
+    ans = []
+    for new in asteroids:
+        while ans and new < 0 < ans[-1]:
+            if ans[-1] < -new:
+                ans.pop()
+            elif ans[-1] > -new:
+                new = 0
+            elif ans[-1] == -new:
+                ans.pop()
+                new = 0
+        if new:
+            ans.append(new)
+    return ans
+
+
+# 32 Remove Adjacent Duplicate from a string  II
+def removeDuplicates(self, s: str, k: int) -> str:
+    stack = []
+    for char in s:
+        if stack and stack[-1][0] == char:
+            stack[-1][1] += 1
+        else:
+            stack.append([char, 1])
+        if stack[-1][1] == k:
+            stack.pop()
+    result = ""
+    for char, count in stack:
+        result += char * count
+    return result
+
+
+# 33 Generate Paranthesis
+def generateParenthesis(self, n: int) -> List[str]:
+    # This is a backtracking problem
+    result = []
+
+    def backtrack(opened, close, current):
+        if opened == close == n:
+            result.append(current)
+            return
+
+        if opened < n:
+            backtrack(opened + 1, close, current + "(")
+
+        if close < opened:
+            backtrack(opened, close + 1, current + ")")
+
+    backtrack(0, 0, "")
+    return result
+
+
+# 34 Unique Paths
+def uniquePaths(self, m: int, n: int) -> int:
+    # build the grid
+    grid = [[1] * n for _ in range(m)]
+    for row in range(1, m):
+        for col in range(1, n):
+            grid[row][col] = grid[row - 1][col] + grid[row][col - 1]
+
+    return grid[m - 1][n - 1]
+
+
+# 35  def minPathSum(self, grid: List[List[int]]) -> int:
+def minPathSum(self, grid: List[List[int]]) -> int:
+    # This is another dynamic programming problem that will be solved with bottom up approach
+    rows, cols = len(grid), len(grid[0])
+    dp = [[math.inf] * (cols + 1) for _ in range(rows + 1)]
+    dp[rows - 1][cols] = 0  # come back to why i am doing rows - 1
+
+    for row in range(rows - 1, -1, -1):
+        for col in range(cols - 1, -1, -1):
+            dp[row][col] = grid[row][col] + min(dp[row][col + 1], dp[row + 1][col])
+
+    return dp[0][0]
+
+
+# 36 Jump Game
+def jump(self, nums: List[int]) -> int:
+    result = 0
+    left = right = 0
+    while right < len(nums) - 1:  # tells us when we've gotten to the end of the list
+        farthest = 0
+        for i in range(left, right + 1):
+            farthest = max(farthest, i + nums[i])
+        left = right + 1
+        right = farthest
+        result += 1
+    return result
+
+
+# 37 Find Winner of circular game
+def findTheWinner(self, n: int, k: int) -> int:
+    # build players
+    players, index = [player + 1 for player in range(n)], 0
+    while players > 1:
+        index = (index + k - 1) % len(players)  # using mod allows us to avoid overflow
+        players.pop(index)
+    return players[0]
+
+
+# 38 Maximum Area of a Piece of Cake After Horizontal and Vertical Cuts
+def maxArea(self, h: int, w: int, horizontalCuts: List[int], verticalCuts: List[int]) -> int:
+    # If you observe carefully, you would realize that the maximum area of area of cake has a width that is equal
+    # to the maximum width gotten after applying only the vertical cuts and has a height equal to the maximum
+    # height after applying only the horizontal cuts
+    # we first sort the array to ensure the cuts are beside each other
+    horizontalCuts.sort()
+    verticalCuts.sort()
+
+    # get the maximum height
+    # consider the edges first
+    max_height = max(horizontalCuts[0], h - horizontalCuts[-1])
+    for i in range(1, len(horizontalCuts)):
+        max_height = max(horizontalCuts[i] - horizontalCuts[i - 1], max_height)
+
+    # get the maximum width
+    # consider the edges first
+    max_width = max(verticalCuts[0], w - verticalCuts[-1])
+    for i in range(1, len(verticalCuts)):
+        max_width = max(verticalCuts[i] - verticalCuts[i - 1], max_width)
+
+    return (max_height * max_width) % (10 ** 9 + 7)
+
+
+# 39 Minimum costs to connect Sticks
+def connectSticks(self, sticks: List[int]) -> int:
+    # we basically use a min heap to because for an optimal solution, we need to
+    # join the two sticks with minimum values
+    heapq.heapify(sticks)
+    minCost = 0
+    while sticks:
+        cost = heapq.heappop(sticks) + heapq.heappop(sticks)
+        minCost += cost
+        heapq.heappush(cost, sticks)
+    return minCost
+
+
+# 40 Jump game
+def canJump(self, nums: List[int]) -> bool:
+    # Greedy Algorithm
+    goal = len(nums) - 1
+    for i in range(len(nums) - 2, -1, -1):
+        if i + nums[i] >= goal:
+            goal = i
+
+    return goal == 0
+
+
+# 41 Robots bounded in a circle
+def isRobotBounded(self, instructions: str) -> bool:
+    # The basic algorithm of this problem is that the robot will be bounded in a circle if either the position after
+    # going through the movements once is unchanged or if there is a change in direction after going through the moveme
+    # nts
+    dirX, dirY = 0, 1  # it initialy faces north
+    x, y = 0, 0
+    for movement in instructions:
+        if movement == "G":
+            x, y = x + dirX, y + dirY
+        elif movement == "L":
+            dirX, dirY = -1 * dirY, dirX  # from algebra, (x,y) is perpendicular to (-y,x)
+        else:
+            dirX, dirY = dirY, -1 * dirX
+    return (x, y) == (0, 0) or (dirX, dirY) != (0, 1)
+
+
+# 42 Max Diff you can get from changing an Integer
+def maxDiff(self, num: int) -> int:
+    # We can approach this with greedy algorithm the max integer from changing the integer would be changing the
+    # first digit in the number that is not's a 9 to a 9 the min integer would be changing either the first integer(
+    # if it's not already a 1) or changing the next digits to zero if it's not already a zero.. we can't change the
+    # first digit to zero since we don't want to have leading zeroes
+    num = str(num)
+    maxInt = num
+    for x in num:
+        if x != '9':
+            maxInt = num.replace(x, '9')
+            break
+
+    minInt = num
+    for x in num:
+        if num[0] == x and x != '1':  # change the first integer to 1 if it's not already 1
+            minInt = num.replace(x, '1')
+            break
+        if minInt[0] != x and x != '0':  # else change the next zero digit to a zero
+            minInt = num.replace(x, '0')
+            break
+    return int(maxInt) - int(minInt)
+
+
+# 43 Count Number of Teams
+def numTeams(self, rating: List[int]) -> int:
+    # This is a bit tricky..would have to come back to this
+    n = len(rating)
+    up = [0] * n
+    down = [0] * n
+    teams = 0
+    for i in range(n):
+        for j in range(i):
+            if rating[j] > rating[i]:
+                up[j] += 1
+                teams += up[i]
+            else:
+                down[j] += 1
+                teams += down[i]
+    return teams
+

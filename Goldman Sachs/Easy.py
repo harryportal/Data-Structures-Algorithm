@@ -51,7 +51,7 @@ def highFive(self, items: List[List[int]]) -> List[List[int]]:
 
 # 3 Pascals Triangle
 def generate(self, numRows: int) -> List[List[int]]:
-    # runtime - O(n^2), space - in the worst casem our temp variable would hold n numbers, O(n)
+    # runtime - O(n^2), space - in the worst case our temp variable would hold n numbers, O(n)
     result = [[1]]
     for i in range(numRows - 1):
         temp = [0] + result[-1] + [0]
@@ -150,7 +150,7 @@ def twoSum(self, nums: List[int], target: int) -> List[int]:
     return []
 
 
-# 10 Count Binary Strings   *
+# 10 Count Binary Strings
 def countBinarySubstrings(self, s: str) -> int:
     """
     Check this for detailed explanation
@@ -214,7 +214,7 @@ def getRow(self, rowIndex: int) -> List[int]:
     # so basically we can initiliase the numerator to the row number given and denominator to 1
     # and then basically decrease the numerator and increase the numerator as we try to figure the value at each column
     # of the rth row
-    # use the link below incase all this still sounds like gibberish
+    # use the link below for a better explanation maybe
     # https://leetcode.com/problems/pascals-triangle-ii/solutions/1203260/very-easy-o-n-time-0-ms-beats-100-simple-maths-all-languages/
     row = [1] * (rowIndex + 1)
     up, down = rowIndex, 1
@@ -288,6 +288,7 @@ def countBits(self, n: int) -> List[int]:
             if num & 1: count += 1
             num >>= 1
         return count
+
     result = []
     for i in range(n + 1):
         result.append(count(i))
@@ -315,7 +316,7 @@ def sortByBits(self, arr: List[int]) -> List[int]:
         # 1 to zero or let's use the usual method of( right shifting and AND logic )since that's more intuitive and
         # can easily be explained to the interviewer
         count = 0
-        while n:  # this will continue until n is zero(runtime is O(32) if in worst case all the bits are 1
+        while n:  # this will continue until n is zero(runtime is O(32) -- O(1) if in worst case all the bits are 1
             if n & 1:
                 count += 1
             n >>= 1
@@ -460,7 +461,7 @@ def nextGreaterElement(self, nums1: List[int], nums2: List[int]) -> List[int]:
     # Neetcode explains here well https://www.youtube.com/watch?v=68a1Dc_qVq4
     numsIndex = {num: index for index, num in enumerate(nums1)}
     result = [-1] * len(nums1)
-    stack = []
+    stack = []  # a monotonically decreasing stack
     for num in nums2:
         while stack and stack[-1] < num:
             value = stack.pop()
@@ -550,7 +551,7 @@ def lastStoneWeight(self, stones: List[int]) -> int:
     # iterate through the list in one pass
     stones = [-stone for stone in stones]  # making all the values negative since python only supports min heaps
     heapq.heapify(stones)  # converts to a max heap
-    for stone in stones:
+    for _ in stones:
         weightY = heapq.heappop(stones)
         weightX = heapq.heappop(stones)
         if abs(weightY) > abs(weightX):  # it's either they are equal or Y is greater
@@ -576,3 +577,148 @@ def findFinalValue(self, nums: List[int], original: int) -> int:
     while original in hashset:
         original *= 2
     return original
+
+
+# 37 Excel Sheet Column Number
+def titleToNumber(self, columnTitle: str) -> int:
+    result = 0
+    for i in range(len(columnTitle)):
+        result *= 26
+        # we can use ASCII conversion to get the character number
+        result += ord(columnTitle[i]) - ord('A') + 1
+    return result
+
+
+# 38 Intersection of Two Linked list
+def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+    # one intuitive approach would be to use an hashset to store all the nodes in one of the linked list  and then
+    # go through the second list checking if the node exists in the hashset
+    # However, we can reduce the complexity to space 0(1) https://www.youtube.com/watch?v=D0X0BONOQhI
+    pointerA, pointerB = headA, headB
+    while pointerA != pointerB:
+        pointerA = pointerA.next if pointerA else headB
+        pointerB = pointerB.next if pointerB else headA
+    return pointerA
+
+
+# 39 Shortest Word Distance
+def shortestDistance(self, wordsDict: List[str], word1: str, word2: str) -> int:
+    # we basically use two pointers
+    n = shortest = len(wordsDict)
+    pointerA = pointerB = None
+    for index, word in enumerate(wordsDict):
+        if word == word1:
+            pointerA = index
+        elif word == word2:
+            pointerB = index
+        if pointerB and pointerA:
+            shortest = min(shortest, abs(pointerA - pointerB))
+    return shortest
+
+
+# 40 Power of Three
+def isPowerOfThree(self, n: int) -> bool:
+    if n <= 0: return False
+    while n % 3 == 0:
+        n //= 3
+    return n == 1
+
+
+# 41 Maximum Depth of Binary Tree
+def minDepth(self, root: Optional[TreeNode]) -> int:
+    # we use bfs to traverse level by level and return the first node with no children
+    queue = [[root, 1]]
+    while queue:
+        node, depth = queue.pop(0)
+        if not node.left and not node.right:
+            return depth
+        if node.left: queue.append([node.left, depth + 1])
+        if node.right: queue.append([node.right, depth + 1])
+
+
+# 42 Palindrome Permutation
+def canPermutePalindrome(self, s: str) -> bool:
+    # Palindrome reads the same from left to right...we have two types of palindrome: odd palindrome where all letters
+    # occurs an even number of times expect for the one in the middle which occurs an odd number of times. Even
+    # palindrome: where all the letters occurs an even number of times. So basically to know if we can a string can be
+    # permuted into a palindrome we need to make sure at most one of the letters occurs in an odd amount of times
+    hashmap = {}
+    for char in s: hashmap[char] = 1 + hashmap.get(char, 0)
+    odd_count = 0
+    for count in hashmap.values():
+        if count % 2 and odd_count == 1: return False
+        if count % 2: odd_count += 1
+    return True
+
+
+# 43 Closest Binary Search Tree Value
+def closestValue(self, root: Optional[TreeNode], target: float) -> int:
+    # we can do a binary search since this is a binary search tree
+    closest = math.inf
+    while root:
+        closest = min(root.val, closest, key=lambda x: abs(target - x))
+        root = root.left if target < root.val else root.right
+    return closest
+
+
+# 44 Perfom String Shifts
+def stringShift(self, s: str, shift: List[List[int]]) -> str:
+    # the brute force would be to modify the string based on each number of shifts and direction
+    # we can optimize this further by computing the net shifts and applying this shifts only once
+    leftShifts = 0
+    for direction, amount in shift:
+        if direction == 0:
+            leftShifts += amount
+        else:
+            leftShifts -= amount
+
+    # there are two cases here now, it's either the leftshift amount is negative which means that the right shift
+    # was more or the number of shifts is more than the length of the string
+    # To take of these two scenarios, we just mod the result by length of the string
+    leftShifts %= len(s)
+    stringShift = s[leftShifts:] + s[:leftShifts]
+    return stringShift
+
+
+# 45 Implement Queues using stacks
+class MyQueue:
+
+    def __init__(self):
+        self.stackA = []  # only supports popping from the end(LIFO)
+        self.stackB = []
+
+    def push(self, x: int) -> None:
+        self.stackA.append(x)
+
+    def pop(self) -> int:
+        for i in range(len(self.stackA) - 1):  # push the values after the first added to a tempoary stack
+            self.stackB.append(self.stackA.pop())
+        result = self.stackA.pop()  # pop the first added value
+        while self.stackB:  # push the values back into the main stack
+            self.push(self.stackB.pop())
+        return result
+
+    def peek(self) -> int:
+        return self.stackA[0]
+
+    def empty(self) -> bool:
+        return len(self.stackA) == 0
+
+
+# 46 Count Negative in a sorted Matrix
+def countNegatives(self, grid: List[List[int]]) -> int:
+    rows, cols = len(grid), len(grid[0])
+    r, c, count = rows - 1, 0, 0
+
+    # we go buttom up  -- last row, first column
+    # if the current number is negative, everything else to the left of the the row will be negative
+    # Hence we move to the upper row
+    while r >= 0 and c < cols:
+        if grid[r][c] < 0:
+            count += cols - c
+            r -= 1
+        else:
+            c += 1
+    return count
+
+# 47 Count Special Quadruplets
