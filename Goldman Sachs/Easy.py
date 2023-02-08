@@ -4,8 +4,6 @@ from typing import List, Optional
 from heapq import heappush
 import heapq
 from Linkedlist import ListNode
-
-# 1 Check if the Sentence Is Pangram
 from Trees import TreeNode
 
 
