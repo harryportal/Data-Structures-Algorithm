@@ -38,3 +38,30 @@ def findKthLargest(self, nums: List[int], k: int) -> int:
     for _ in range(k):
         kthlargest = -(heapq.heappop(nums))
     return kthlargest
+
+
+# 373. Find K Pairs with Smallest Sums
+def kSmallestPairs(self, nums1: List[int], nums2: List[int], k: int) -> List[List[int]]:
+    """ Whenever you see a "top k" Question, the first thing you should mention to your interviewer is sorting algorithm
+    and then talk about how using heaps can optimise the previous approach especially for large inputs.
+    For this question the idea centers around maintaining a min heap of size K"""
+    # initialise a min heap of size k using nums1 against the first value in nums2
+    heap = [(nums1[i]+nums2[0], i, 0) for i in range(min(len(nums1), k))]
+    heapq.heapify(heap)
+    checked = {(i,0) for i in range(min(len(nums1), k))} # hashset to avoid reusing the same pair of index
+
+    result = []
+    while heap and k > 0:
+        _, i, j = heapq.heappop(heap)
+        result.append([nums1[i], nums2[j]])
+        k -= 1
+
+        if i + 1 < len(nums1) and (i+1, j) not in checked:
+            heapq.heappush((nums1[i+1] + nums2[j], i+1, j), heap)
+            checked.add((i+1, j))
+
+        if j + 1 < len(nums2) and (i, j + 1) not in checked:
+            heapq.heappush((nums1[i] + nums2[j + 1], i, j+1), heap)
+            checked.add((i, j+1))
+
+    return result

@@ -1,4 +1,7 @@
 # 41 Robots bounded in a circle  -- Maths and Geometry
+import math
+
+
 def isRobotBounded(self, instructions: str) -> bool:
     """The basic algorithm of this problem is that the robot will be bounded in a circle if either the position after
     going through the movements once is unchanged or if there is a change in direction after going through the movements
@@ -85,3 +88,52 @@ def fractionToDecimal(self, numerator: int, denominator: int) -> str:
             decimals.insert(remainders.index(remainder) + 1, "(")
             decimals.append(")")
             return prefix + decimals[0] + "." + str(decimals[1:])
+
+
+# Count Primes
+def countPrimes(self, n: int) -> int:
+    """ This is a very interesting problem.
+    Well to start, you could just come up with the brute force approach which is to go from 1 to sqrt n(using square
+    root of n here instead of n because mathematically, every non - prime number has at least one factor(prime) less
+    than the square root of the value. So we have a function checkPrime that uses the above algorithm and we call the
+    function on every numbers from 2 to the value given. In worst case, our time complexity will be O(sqrt(n)n) --
+    This does not pass all leetcode test cases(but fair enough should impress the interviewer at least).
+    One immediate improvement is to only call the checkPrime function on only odd numbers since we know every even
+    number except for 2 is not a prime number
+    """
+
+
+    if n <= 2: return 0
+
+    def check(value):  # complexity --> O(sqrt(n))
+        for i in range(2, int(math.sqrt(value)) + 1):
+            if value % i == 0:
+                return False
+        return True
+
+    count = 1  # since we are sure 2 will be included
+
+    for i in range(2, n):  # complexiy --> O((n/2)sqrt(n))
+        if i % 2 and check(i): count += 1  # check only odd numbers
+
+    return count
+
+# Count Primes -- Opimal Approach
+def countPrimes(self, n: int) -> int:
+    """ To improve on the previous appraoch, we can use Sieve of Eratosthenes Algorithm
+    which basically assumes that every number up to n is initially prime. It then iteratively take each of the
+    numbers and make their multiples non prime. You can read more about the algorithm"""
+    if n <= 2: return 0
+    isPrime = [True] * n
+
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if isPrime[i]:
+            j = 2
+            while i * j < n:
+                isPrime[i*j] = False
+                j += 1
+
+    count = 0
+    for i in range(2, n):
+        if isPrime[i]: count += 1
+    return count

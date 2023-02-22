@@ -259,3 +259,129 @@ def numIslands(self, grid: List[List[str]]) -> int:
                 num_islands += 1
 
     return num_islands
+
+
+# 236. Lowest Common Ancestor of a Binary Tree
+def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    """ For every node we check the left and right subtree, whenever we see any of the numbers we return it as it
+    LCA since a node can be a LCA of itself. If at the end of the the one of the numbers exists in both the left
+    and right subtree, then the current node is the the LCA. If that's not the case then any of the numbers seen first
+    becomes the LCA"""
+    def check(node, p, q):
+        if node == p or node == q:
+            return node
+        if not node:
+            return None
+
+        left = check(node.left, p,q)
+        right = check(node.right, p, q)
+
+        if left and right:  # then one of the values occur in left and the other right subtree
+            return node
+
+        return left if left else right  # one of the nodes is the LCA of the two nodes
+
+    return check(root,p,q)
+
+# 399. Evaluate Division
+def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
+    """ We build a weighted graph and use bfs to find the shortest path between the two nodes """
+
+    graph = {}
+    for (x,y), value in zip(equations, values):
+        if x not in graph:
+            graph[x] = {}
+        if y not in graph:
+            graph[y] = {}
+        graph[x][y] = value
+        graph[y][x] = 1/value
+
+    def bfs(src, dest):
+        if not (src in graph and dest in graph): # edge case
+            return -1
+        queue, visited = [[src, 1.0]], set()
+        while queue:
+            node, value = queue.pop(0)
+            visited.add(node)
+            if node == dest:
+                return value
+            for neighbour in graph[node]:
+                if neighbour not in visited:
+                    queue.append([neighbour, value*graph[node][neighbour]])
+        return -1
+    return [bfs(x,y) for x, y in queries]
+
+
+# Binary Tree ZigZag Order Traversal
+def zigzagLevelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+    """ Just do your regular bfs and append the reverse of the level for odd level numbers(which corresponds to even
+    lenght for the result array)"""
+    if not root: return []
+    queue = [root]
+    result = []
+    while queue:
+        for i in range(len(queue)):
+            current_level = []
+            node = queue.pop(0)
+            current_level.append(node.val)
+            if node.left: queue.append(node.left)
+            if node.right: queue.append(node.right)
+        current_level = reversed(current_level) if len(result) % 2 else current_level
+        result.append(current_level)
+    return result
+
+
+# Find the Celebrity -- Premium
+def findCelebrity(self, n: int) -> int:
+
+    def knows(a,b):  # This Api was actually defined in the Leetcode Question, i just kept it as a dummy here
+        return True
+
+    candidate = 0
+    for i in range(1, n):
+        # if the current candidate knows the current person, it can never be the findCelebrity
+        if knows(candidate, i):
+            candidate = i
+
+    for i in range(n):  # check that everyones know we think is the celebrity and that the candidate knows no one
+        if i != candidate and (knows(candidate, i) or not knows(i, candidate)):
+            return -1
+    return candidate
+
+# Pacific Atlantic Water Flow
+def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+    """
+    The first approach you think of might be doing a dfs on each node to check the left, right, top and bottom values
+    recursively to see if they are less than the current value, However this approach would lead to O(n.m)^2
+    To make the time complexity better, we can look at the question from another angle..We start from the left and top
+    of the matrix, to look for values(positions) that can get to pacific ocean..We do the same for atlantic ocean(this
+    time with bottom and right of the matrix).. After that we basically return the positions that is common to both
+    pacific and atlantic
+    """
+    rows, cols = len(heights), len(heights[0])
+    pacific, atlantic = set(), set()
+    def dfs(row, col, ocean, previousHeight):
+        # let's define our base case
+        currentHeight = heights[row][col]
+        if row < 0 or col < 0 or row >= rows or cols >= cols or currentHeight < previousHeight:
+            return
+        # add the coordinate to the set for the current ocean
+        ocean.add((row,col))
+        dfs(row, col + 1, ocean, currentHeight)
+        dfs(row, col - 1, ocean, currentHeight)
+        dfs(row + 1, col, ocean, currentHeight)
+        dfs(row - 1, col, ocean, currentHeight)
+
+    # let's check from the bottom and top
+    for col in range(cols):
+        dfs(0, col, pacific, -1)
+        dfs(rows - 1, col, atlantic, -1)
+
+    # let's check from the right and left
+    for row in range(rows):
+        dfs(row, 0, pacific, -1)
+        dfs(row, cols - 1, atlantic, -1)
+
+    return [[i,j] for i,j in (atlantic & pacific)]
+
+

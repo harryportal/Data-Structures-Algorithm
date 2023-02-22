@@ -159,3 +159,23 @@ def numPairsDivisibleBy60(self, time: List[int]) -> int:
         remainders[t % 60] += 1
     return pairsCount
 
+
+# 325. Maximum Size Subarray Sum Equals k
+def maxSubArrayLen(self, nums: List[int], k: int) -> int:
+    """we use a prefix Sum approach
+    we store the cummulative Sum up to eaxh index in an hashmap, whenever the cummulative sum equals k, we check if
+    the lenght is greater than our current maximum lenght.. we also do a check to see if the Sum - k already exists
+    in the prefix Sum hashmap"""
+    prefixSum = {}
+    currSum, maxLen = 0, 0
+    for i in range(len(nums)):
+        currSum += nums[i]
+        if currSum == k:
+            maxLen = max(maxLen, i + 1)
+        if currSum - k in prefixSum:
+            maxLen = max(i - prefixSum[currSum], maxLen)
+        if currSum not in prefixSum:
+            prefixSum[currSum] = i
+    return maxLen
+
+

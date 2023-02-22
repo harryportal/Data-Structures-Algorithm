@@ -129,3 +129,17 @@ def deleteAndEarn(self, nums: List[int]) -> int:
     for i in range(2, maxNumber):
         maxEarnings[i] = max(maxEarnings[i - 1], maxEarnings[i - 2] + points[nums[i]])
     return maxEarnings[maxNumber]
+
+
+# Word Break
+def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+    # Neetcode explains very well! https://www.youtube.com/watch?v=Sx9NNgInc3A
+    dp = [False] * len(s) + 1
+    dp[len(s)] = True
+    for i in range(len(s)-1, -1, -1):
+        for w in wordDict:
+            if i + len(w) <= len(s) and s[i:i+len(w)] == w:
+                dp[i] = dp[i + len(w)]
+            if dp[i]:
+                break
+    return dp[0]

@@ -112,3 +112,56 @@ class SparseVector:
         for vectorA, vectorB in zip(self.array, vec.array):
             result += vectorA * vectorB
         return result
+
+
+# 240. Search a 2D Matrix II
+def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+    """ The obvious thing to do here is search the enitre matrix for our target. However the sorted property of the ma
+    trix should hint us that we can narrow down the search to specific column or row as we go through the matrix
+    So basically we start from either the top right or the bottom left of the matrix, if the current value is less than
+    the the value at the current position of the matrix, we move to the left by decreasing our column number by 1.
+    If the value is more than the current value position, we move to the next row for that same column number.. Hopef
+    ully this is explanatory enough"""
+    if not matrix: return False
+
+    row, col = 0, len(matrix[0]) - 1
+    while row < len(matrix) and col >= 0:
+        value = matrix[row][col]
+        if value == target:
+            return True
+
+        elif value < target:
+            col -= 1
+
+        else: # value more than the target so we move to the next rows
+            row += 1
+    return False
+
+
+# Next Permutation
+def nextPermutation(self, nums: List[int]) -> None:
+    # Brute force approach would be generate every possible permutations of the list, sort them and return the
+    # one to the current list....
+    n = len(nums) - 1
+    i = n - 2
+    # look for the rightmost pair that's in ascending order, if we don't see any then the list is already sorted in
+    # descending order which means it has no next greater permutation
+    while i >= 0 and nums[i] >= nums[i + 1]:
+        i -= 1
+
+    # if we find an adjacent pair, we look for the smallest element towards the right of the left element
+    # in our pair and swap them
+    if i >= 0:
+        j = n - 1
+        while j >= 0 and nums[i] >= nums[j]:
+            j -= 1
+        nums[i], nums[j] = nums[j], nums[i]
+
+    # sort the right side of the left element in our pair in ascending order to make sure it's in the lowest order
+    left, right = i + 1, n - 1
+    while left < right:
+        nums[right], nums[left] = nums[left], nums[right]
+        right -= 1
+        left += 1
+
+
