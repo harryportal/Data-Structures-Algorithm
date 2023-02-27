@@ -3,15 +3,21 @@ from _ast import List
 # 68 Find Peak Element -- Binary Search
 def findPeakElement(self, nums: List[int]) -> int:
     """Solving this with binary search is quite tricky
-    I recommend reading the offical solution for a good explanation on why binary search works here despite the
-    array not been necceasarily sorted"""
+    This is a quick breakdown..Note the interviewer will definitely not hint you about binary search so it's okay
+    to talk about the linear approach which is too easy for an interview question.
+    Basically when doing our binary search here, we're just trying to cut a section of the array that does'nt need to
+    be checked.
+    if we start from the middle of the list, we check if the number at the middle is more than the number directly after
+    it. If that is the case, the number at the middle is a potential peak element so we don't need to check the array
+    starting from the number after the current middle number. Reverse is the case if the number at the middle is
+    less than the number just after it."""
     low, high = 0, len(nums) - 1
     while low < high:
         mid = (low + high) // 2
-        if nums[mid] < nums[mid + 1]:
-            low = mid + 1  # we eliminate half of the array
-        else:
+        if nums[mid] > nums[mid + 1]:
             right = mid
+        else:
+            left = mid + 1
     return low
 
 
@@ -38,7 +44,7 @@ def search(self, nums: List[int], target: int) -> int:
                 high = mid - 1
             else:
                 low = mid + 1
-        return -1  # Target was not found
+    return -1  # Target was not found
 
 
 # 80 Find K Closest Elements --  Binary Search
@@ -54,6 +60,21 @@ def findClosestElements(self, arr: List[int], k: int, x: int) -> List[int]:
         else:
             right = mid
     return arr[left:left + k]
+
+# H Index II
+def hIndex(self, citations: List[int]) -> int:
+    low, high = 0, len(citations) - 1
+    n = len(citations)
+    while low <= high:
+        mid = (low + high) // 2
+        if citations[mid] == n - mid:
+            return  n - mid
+        elif citations[mid] < n - mid:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return n - low
+
 
 
 # 20 Find Minimum in a rotated Sorted Array  -- Binary Search

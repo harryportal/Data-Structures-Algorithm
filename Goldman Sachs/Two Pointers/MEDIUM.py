@@ -1,9 +1,7 @@
 import math
 from typing import List
 
-
-
-# 71 3 Sum Smaller
+# 1  3 Sum Smaller
 def threeSumSmaller(self, nums: List[int], target: int) -> int:
     count = 0
     nums.sort()
@@ -18,12 +16,14 @@ def threeSumSmaller(self, nums: List[int], target: int) -> int:
                 k -= 1
     return count
 
-
-# 67  3 Sum closest -- Two pointers
+# 2  3 Sum closest -- Two pointers
 def threeSumClosest(self, nums: List[int], target: int) -> int:
     """the problem would be easier to solve if you've solved the following problems
     Two Sum, Two Sum II and 3 Sum
     """
+    # One inefficient approach you can first talk about is computing the sum of every possible pair, using a hashmap
+    # to map the sum to the three values that produced them. Sorting the sum values to get the one closest to our target
+    # and returning it corresponding sum from the hashmap
     nums.sort()
     closest = math.inf
     for i in range(len(nums) - 2):
@@ -70,8 +70,7 @@ def maxArea(self, height: List[int]) -> int:
 
 # 14 Three Sum -- Two Pointers
 def threeSum(self, nums: List[int]) -> List[List[int]]:
-    # the brute force approach would be to use three nested for loop to check every three pairs
-    # that can be formed by each interger  - O(n^3)
+    # the brute force approach would be to use three nested for loop to check every three pairs that equals zero-O(n^3)
     # I recommend solving Leetcode's "Two Sum II" problem as the problem is just an extension of it!
     # we can reduce this runtime to 0(n^2), if we sort the array(remember the "Two Sum II" problem?)
     # pick each integer, and use the idea of (Two Sum II) question to see which two integers can add
@@ -115,6 +114,8 @@ def longestPalindrome(self, s: str) -> str:
     maximum_length = 0
 
     def check(left, right):
+        nonlocal maximum_length
+        nonlocal  result
         while left >= 0 and right < len(s) and s[right] == s[left]:
             length = right - left + 1
             if length > maximum_length:
@@ -130,5 +131,20 @@ def longestPalindrome(self, s: str) -> str:
         # even palindrome
         check(i, i + 1)
     return result
+
+
+# Minimum Length of String After Deleting Similar Ends
+def minimumLength(self, s: str) -> int:
+    """ Set two pointers to point at the beginning and end of the list. Once we find two letter equal from
+    the right and left, we get the number of characters equal to the character from both sides"""
+    left, right = 0, len(s) - 1
+    while left < right and s[left] == s[right]:
+        char = s[left]
+        while left < len(s) and s[left] == char:
+            left += 1
+        while right >= 0 and s[right] == char:
+            right -= 1
+        if right < left: return 0
+    return right - left + 1
 
 

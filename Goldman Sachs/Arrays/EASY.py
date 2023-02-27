@@ -1,7 +1,7 @@
-# 3 Pascals Triangle
+import math
 from typing import List
 
-
+# 1 Pascals Triangle
 def generate(self, numRows: int) -> List[List[int]]:
     # runtime - O(n^2), space - in the worst case our temp variable would hold n numbers, O(n)
     result = [[1]]
@@ -13,7 +13,7 @@ def generate(self, numRows: int) -> List[List[int]]:
         result.append(row)
     return result
 
-# 8 Merge Sorted Arrays
+# 2 Merge Sorted Arrays
 def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
     """
     Do not return anything, modify nums1 in-place instead.
@@ -46,7 +46,7 @@ def pivotIndex(self, nums: List[int]) -> int:
     leftSum, total = 0, sum(nums)
     for i in range(len(nums)):
         rightSum = total - leftSum - nums[i]
-        if rightSum == leftSum:
+        if rightSum == leftSum:  # check if the current index is the pivot index
             return i
         leftSum += nums[i]
     return -1
@@ -99,7 +99,7 @@ def titleToNumber(self, columnTitle: str) -> int:
     return result
 
 
-# 31 Move Zeroes
+# 7 Move Zeroes
 def moveZeroes(self, nums: List[int]) -> None:
     # One approach is to create two arrays, store the zeroes in ones and the others in the second one and join the two
     # lists. We can optimize the space complexity to 0(1) by using the knowledge of quick sort algorithm to partition
@@ -112,7 +112,7 @@ def moveZeroes(self, nums: List[int]) -> None:
             left += 1
 
 
-# 21 Greatest Common Divisor of Two Strings
+# 8 Greatest Common Divisor of Two Strings
 def gcdOfStrings(self, str1: str, str2: str) -> str:
     # we can approach this mathematically
     # if two numbers have a common divisor, this means that two numbers can be expressed as a multiple of that divisor
@@ -127,32 +127,9 @@ def gcdOfStrings(self, str1: str, str2: str) -> str:
     return str1[:gcdLength]
 
 
-def getRow(self, rowIndex: int) -> List[int]:
-    # so the first approach we can use here is to simple generate r number of rows for the pascal triangle
-    # and then return the last row in our list as the answer -- rutime O(n^2)
-    # but that can be optimized using some basic knowledge of maths and combinations
-    # Here are few things to note
-    # The kth row in a pascal triangle will have k + 1 numbers
-    # to get a value at a row or column in a pascal triangle can be done using combination
-    # value at nth row and kth column = nCk = n!/(n-k)!k! == n*(n-1)*...(n-k+1)/k!
-    # e.g 5C4 == 5*4*3*2/1*2*3*4
-    # so basically we can initiliase the numerator to the row number given and denominator to 1
-    # and then basically decrease the numerator and increase the numerator as we try to figure the value at each column
-    # of the rth row
-    # use the link below for a better explanation maybe
-    # https://leetcode.com/problems/pascals-triangle-ii/solutions/1203260/very-easy-o-n-time-0-ms-beats-100-simple-maths-all-languages/
-    row = [1] * (rowIndex + 1)
-    up, down = rowIndex, 1
-    for i in range(1, rowIndex):
-        row[i] = int(row[i - 1] * up / down)
-        up -= 1
-        down += 1
-    return row
-
-
-# 7 Rotate Strings
+# 9 Rotate Strings
 def rotateString(self, s: str, goal: str) -> bool:
-    # the first thing you migth think of is to split the first string into array
+    # the first thing you might think of is to split the first string into array
     # and keep keep rotating within the range of its length, then for every rotation
     # we compare it with second string, we return False if there was no match
 
@@ -166,9 +143,11 @@ def rotateString(self, s: str, goal: str) -> bool:
     # the complexity is an overkill for a leetcode "Easy" question
 
 
-# 40 Power of Three
+# 10 Power of Three
 def isPowerOfThree(self, n: int) -> bool:
     if n <= 0: return False
     while n % 3 == 0:
         n //= 3
     return n == 1
+
+

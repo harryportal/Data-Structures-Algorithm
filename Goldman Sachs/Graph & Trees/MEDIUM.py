@@ -384,4 +384,51 @@ def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
 
     return [[i,j] for i,j in (atlantic & pacific)]
 
+# Number of Provinces
+def findCircleNum(self, isConnected: List[List[int]]) -> int:
+    """ The problem can be modeled as a graph and this question is actually asking us to find the number of
+    connected edges in an undirected graph"""
+    visited = set()
+    n = len(isConnected)
+    provinces = 0
+    def dfs(city):
+        visited.add(city)
+        for neighbour in range(n):
+            if isConnected[city][neighbour] and neighbour not in visited:
+                dfs(neighbour)
+    for city in range(n):
+        if city not in visited:
+            dfs(city)
+            provinces += 1
+    return provinces
 
+# Course Schedule
+def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+    result = []
+
+    # build adjancency list
+    courses = {course:[] for course in range(numCourses)}
+    for course, preq in prerequisites:
+        courses[course].append(prerequisites)
+
+    # dfs logic
+    completed, cycle = set(), set()
+    def dfs(course):
+        if course in cycle:
+            return False
+        # if the dfs logic ran on the current course before of if by checking the courses hashmap, the course
+        # has no prerequisites, we return True immediately
+        if course in completed:
+            return True
+
+        cycle.add(course)
+        for preq in courses[course]:
+            if not dfs(course): return False
+        cycle.remove(course)
+        completed.add(course)
+        result.append(course)
+        return True
+    for course in range(numCourses):
+        if not dfs(course): return []
+
+    return result

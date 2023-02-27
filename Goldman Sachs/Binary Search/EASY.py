@@ -1,5 +1,9 @@
 # 29 Binary Search
+from typing import List
+
+
 def search(self, nums: List[int], target: int) -> int:
+    # A 0(log(n)) approach to finding a value in a sorted list
     low, high = 0, len(nums) - 1
     while low <= high:
         mid = (low + high) // 2

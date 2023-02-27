@@ -116,7 +116,7 @@ def compress(self, chars: List[str]) -> int:
     for i in chars:
         counter[i] = 1 + counter.get(i, 0)
     count = len(counter)  # number of characters
-    for i in counter.keys():  # get the length of the each frequency digits(if it's not 1)
+    for i in counter.values():  # get the length of the each frequency digits(if it's not 1)
         if i != 1:
             count += len(str(i))
     return count  # won't work if you try it on leetcode sha
@@ -177,5 +177,46 @@ def maxSubArrayLen(self, nums: List[int], k: int) -> int:
         if currSum not in prefixSum:
             prefixSum[currSum] = i
     return maxLen
+
+
+# Snapshot Array
+class SnapshotArray:
+    """
+    - we use an integer to represent the current snap id
+    set - We use hashmap to map the index to to the value and current snap id {index: [(val, snap_id)]}
+    snap - simply increase the snap id by 1 and return snapid - 1
+    get - check if index exist in hashmap, if it does we perform a linear search or better still a binary search
+    since the list will be sorted based on the snap id. Also there's a little edge case here(This might change in an
+    actual interview so make sure you ask clarifying questions). The edge case is just in case we don't see the exact
+    exact snap id, we return the val that has the snap id closest to it."""
+    def __init__(self, length: int):
+        self.map = {}
+        self.snap_id = 0
+
+    def set(self, index: int, val: int) -> None:
+        if index not in self.map:
+            self.map[index] = []
+        self.map[index].append((val, self.snap_id))
+
+    def snap(self) -> int:
+        self.snap_id += 1
+        return self.snap_id - 1
+
+    def get(self, index: int, snap_id: int) -> int:
+        if index in self.map:
+            values = self.map[index]
+            # binary search
+            left, right = 0, len(values) - 1
+            ans = -1
+            while left <= right:
+                mid = (left + right) // 2
+                if values[mid][1] <= snap_id:
+                    ans = mid
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            if ans == -1: return 0 # this will happen if the current snap id is greater than all the snapids for the index
+            return values[ans][0]
+        return 0
 
 

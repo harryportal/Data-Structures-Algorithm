@@ -1,7 +1,7 @@
 from typing import List
 
 
-# 10 Count Binary Strings
+# 1 Count Binary Strings
 def countBinarySubstrings(self, s: str) -> int:
     """
     Check this for detailed explanation
@@ -17,7 +17,7 @@ def countBinarySubstrings(self, s: str) -> int:
     ans += min(prev, curr)
     return ans
 
-# 20 Minimum Value to Get Positive Step by Step Sum
+# 2 Minimum Value to Get Positive Step by Step Sum
 def minStartValue(self, nums: List[int]) -> int:
     # we precompute the sum using 0 as a start value and get the minimum of the step by step sum
     # Our minimum start value should be able to make the minimum of all step by step sum equal to exactly 1
@@ -27,7 +27,7 @@ def minStartValue(self, nums: List[int]) -> int:
         minStep = min(total, minStep)
     return 1 - minStep
 
-# 22 Reverse String
+# 3 Reverse String
 def reverseString(self, s: List[str]) -> None:
     # we simply make use of two pointers to swap the letters in place
     left, right = 0, len(s) - 1

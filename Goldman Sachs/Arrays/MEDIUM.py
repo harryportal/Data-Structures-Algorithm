@@ -1,6 +1,6 @@
 from typing import List
 
-# 77 Set Matrix Zeroes
+# 1 Set Matrix Zeroes
 def setZeroes(self, matrix: List[List[int]]) -> None:
     """ The simple approach here is to use a hashset to store row and columns numbers that need to be set to zero
     However, we can reduce the space to 0(1) by using the matrix itself as the set, we go through the matrix and for
@@ -10,8 +10,7 @@ def setZeroes(self, matrix: List[List[int]]) -> None:
     first value of the first column) and this will make everything in the first column also zero even though it's not
     supposed to be. To solve this we use an additional variable to check if the first column needs to be set to zero
 
-    Ps: you should actually mention this hashset approach first and only talk about this if the interviewer wants a
-    better approach(don't over engineer from the start)
+    Ps: you should actually mention this hashset approach first and then talk about this as a better alternative
     """
     rows, cols = len(matrix), len(matrix[0])
     is_col = False
@@ -44,7 +43,7 @@ def setZeroes(self, matrix: List[List[int]]) -> None:
 
 
 
-# 56 Find the Index of the First Occurrence in a String
+# 2 Find the Index of the First Occurrence in a String
 def strStr(self, haystack: str, needle: str) -> int:
     # let's do brute force for now
     # we can further optimize the brute force greatly but i'll come back to that when i understand string matching
@@ -53,7 +52,7 @@ def strStr(self, haystack: str, needle: str) -> int:
             return i
     return -1
 
-# 45 Product of Array Except Self -- Arrays
+# 3 Product of Array Except Self -- Arrays
 def productExceptSelf(self, nums: List[int]) -> List[int]:
     # The brute force here will be to compute the product just before the current number and use another for loop
     # to compute the product of the rest....We can reduce the runtime from O(n^2) to 0(n) by computing the product
@@ -72,7 +71,7 @@ def productExceptSelf(self, nums: List[int]) -> List[int]:
     return result
 
 
-# 37 Find Winner of circular game -- Arrays
+# 4 Find Winner of circular game -- Arrays
 def findTheWinner(self, n: int, k: int) -> int:
     # build players
     players, index = [player + 1 for player in range(n)], 0
@@ -82,8 +81,9 @@ def findTheWinner(self, n: int, k: int) -> int:
     return players[0]
 
 
-# 36 Jump Game -- BFS
+# 5 Jump Game
 def jump(self, nums: List[int]) -> int:
+    # Neetcode has a clever explanation of the algorithm used here
     result = 0
     left = right = 0
     while right < len(nums) - 1:  # tells us when we've gotten to the end of the list
@@ -96,7 +96,7 @@ def jump(self, nums: List[int]) -> int:
     return result
 
 
-# 63 Dot Product of Two Sparse Vectors
+# 6 Dot Product of Two Sparse Vectors
 class SparseVector:
     def __init__(self, nums: List[int]):
         self.array = nums
@@ -110,7 +110,8 @@ class SparseVector:
         vector, the time taken to compute the hashing also affect our solution"""
         result = 0
         for vectorA, vectorB in zip(self.array, vec.array):
-            result += vectorA * vectorB
+            if vectorA and vectorB:
+                result += vectorA * vectorB
         return result
 
 
@@ -141,8 +142,8 @@ def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
 # Next Permutation
 def nextPermutation(self, nums: List[int]) -> None:
     # Brute force approach would be generate every possible permutations of the list, sort them and return the
-    # one to the current list....
-    n = len(nums) - 1
+    # one next to the current list....
+    n = len(nums)
     i = n - 2
     # look for the rightmost pair that's in ascending order, if we don't see any then the list is already sorted in
     # descending order which means it has no next greater permutation
@@ -152,7 +153,7 @@ def nextPermutation(self, nums: List[int]) -> None:
     # if we find an adjacent pair, we look for the smallest element towards the right of the left element
     # in our pair and swap them
     if i >= 0:
-        j = n - 1
+        j = n - 1 # we start checking from the list
         while j >= 0 and nums[i] >= nums[j]:
             j -= 1
         nums[i], nums[j] = nums[j], nums[i]
@@ -165,3 +166,55 @@ def nextPermutation(self, nums: List[int]) -> None:
         left += 1
 
 
+# Find all the good Indices
+def goodIndices(self, nums: List[int], k: int) -> List[int]:
+    """ For this problem, we use two arrays.
+    - One to keep track of the number of descending values towards the left of each index and one to determine
+    the number of ascending values towards the right of the index. E.g leftArray[i] = 2 means at index i, there are 2
+    values towards the left and they are in descending order..You get the gist now"""
+    # an helper function to do the counting, we call it on the array and reverse of the array
+    def helper(nums):
+        counter = 0
+        arr = [0] * len(nums)
+        for index, value in enumerate(nums):
+            arr[index] = counter
+            if index > 0 and nums[index - 1] >= value:
+                counter += 1
+            else:
+                counter = 1  # we reset the counter
+        return arr
+
+    leftCount = helper(nums)
+    rightCount = helper(nums[::-1])[::-1]
+    return [i for i in range(len(nums)) if leftCount[i] >= k and rightCount[i] >= k]
+
+
+# Spiral Matrix
+def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+    # we set up boundaries
+    # Neetcode has a pretty good explanation on the algorithm used here https://www.youtube.com/watch?v=BJnMZNwUk1M
+    left, right = 0, len(matrix[0]) - 1  # column boundaries
+    top, bottom = 0, len(matrix) - 1  # row boundaries
+    result = []
+    while top <= bottom and left <= right:
+        # top row
+        for col in range(left, right + 1):
+            result.append(matrix[top][col])
+        top += 1
+        # right column
+        for i in range(top, bottom + 1):
+            result.append(matrix[i][right])
+        right -= 1
+        # check if boundaries are intact
+        if not (top <= bottom and left <= right):
+            break
+
+        # bottom row
+        for i in range(right, left - 1, - 1):
+            result.append(matrix[bottom][i])
+        bottom -= 1
+        # left column
+        for i in range(bottom, top - 1, -1):
+            result.append(matrix[i][left])
+        left += 1
+    return result

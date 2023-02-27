@@ -1,8 +1,6 @@
-
-# 1 Check Pangram
 from typing import List
 
-
+# 1 Check Pangram
 def checkIfPangram(self, sentence: str) -> bool:
     # create an hashset to hold unique characters, keep adding the characters to the hashset as
     # you go through the list, if the length of the set gets to 26 at any point return True
@@ -41,28 +39,58 @@ def isAnagram(self, s: str, t: str) -> bool:
     counter = {}
     for char in s:
         counter[char] = 1 + counter.get(counter, 0)
-    length = len(counter)  # get the size of unique characters
     for char in t:
-        if char not in counter or counter[char] < 0:
+        if char not in counter:
             return False
         counter[char] -= 1
         if counter[char] == 0:
-            length -= 1
-    return length == 0
+            del counter[char]
+    return True
+
+class Node:
+    def __init__(self, key = 0, value = 0):
+        self.key = key
+        self.value = value
+        self.next = None
 
 # 16 Design Hashmap
 class MyHashMap:
+    # Linkedlist Chaining Method + Modulo
+    # Watch Neetcode Explanation to understand the algorithm used here https://www.youtube.com/watch?v=cNWsgbKwwoU
+
     def __init__(self):
-        self.hashmap = {}
+        self.array = [Node(0,0)] * 1000
+
+    def hash(self, value):
+        return value % len(self.array)
 
     def put(self, key: int, value: int) -> None:
-        self.hashmap[key] = value
+        # if the key exists, we update it if not we add it to the linked list
+        curr = self.array[self.hash(key)]
+        while curr.next:
+            if curr.next.key == key:
+                curr.next.val = value
+                return
+            curr = curr.next
+        curr.next = Node(key, value)
+
 
     def get(self, key: int) -> int:
-        return self.hashmap[key] if key in self.hashmap else -1
+        curr = self.array[self.hash(key)]
+        curr = curr.next
+        while curr:
+            if curr.key == key:
+                return curr.value
+            curr = curr.next
+        return -1
 
     def remove(self, key: int) -> None:
-        if key in self.hashmap: del self.hashmap[key]
+        curr = self.array[self.hash(key)]
+        while curr.next:
+            if curr.next.key == key:
+                curr.next = curr.next.next
+            else:
+                curr = curr.next
 
 # 42 Palindrome Permutation
 def canPermutePalindrome(self, s: str) -> bool:
